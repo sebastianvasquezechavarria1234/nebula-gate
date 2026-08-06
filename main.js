@@ -13,7 +13,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050510);
-scene.fog = new THREE.FogExp2(0x050510, 0.02);
+scene.fog = new THREE.FogExp2(0x050510, 0.012);
 
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
 camera.position.set(14, 7, 14);
@@ -31,7 +31,7 @@ controls.update();
 const FLOOR_Y = -0.5;
 const CEILING_Y = 5.5;
 const PORTAL_Y = 2.5;
-const FLOOR_CEILING_SIZE = 50;
+const FLOOR_CEILING_SIZE = 70;
 
 function createNoiseTexture(w, h, r, g, b, scale) {
     const c = document.createElement('canvas');
@@ -238,7 +238,7 @@ const columnMaterial = new THREE.MeshStandardMaterial({
 
 const columns = [];
 const gridSize = 10;
-const spacing = 3;
+const spacing = 5;
 
 for (let x = 0; x < gridSize; x++) {
     for (let z = 0; z < gridSize; z++) {
@@ -272,39 +272,143 @@ for (let x = 0; x < gridSize; x++) {
     }
 }
 
+function createCloudTexture() {
+    const c = document.createElement('canvas');
+    c.width = 512;
+    c.height = 512;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 60; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const r = 40 + Math.random() * 120;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+        const brightness = 0.03 + Math.random() * 0.06;
+        g.addColorStop(0, `rgba(60,80,120,${brightness})`);
+        g.addColorStop(0.4, `rgba(30,50,90,${brightness * 0.5})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 512, 512);
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+}
+
+const cloudTex = createCloudTexture();
+const cloudGroup = new THREE.Group();
+scene.add(cloudGroup);
+
+const cloudData = [
+    { x: 0, z: 0, y: 0.5, scale: 30, opacity: 0.6, speed: 0.0003, rotSpeed: 0.0001 },
+    { x: -15, z: 10, y: 1.5, scale: 25, opacity: 0.5, speed: 0.0004, rotSpeed: -0.0002 },
+    { x: 12, z: -8, y: 2, scale: 28, opacity: 0.45, speed: -0.0003, rotSpeed: 0.00015 },
+    { x: -8, z: -15, y: 3, scale: 22, opacity: 0.5, speed: 0.0005, rotSpeed: -0.0001 },
+    { x: 18, z: 15, y: 1, scale: 32, opacity: 0.4, speed: -0.0002, rotSpeed: 0.0002 },
+    { x: -20, z: -5, y: 4, scale: 26, opacity: 0.35, speed: 0.0003, rotSpeed: -0.00015 },
+    { x: 5, z: 20, y: 2.5, scale: 24, opacity: 0.55, speed: -0.0004, rotSpeed: 0.0001 },
+    { x: -10, z: -20, y: 0.8, scale: 30, opacity: 0.45, speed: 0.0002, rotSpeed: -0.0002 },
+    { x: 20, z: -15, y: 3.5, scale: 20, opacity: 0.3, speed: -0.0003, rotSpeed: 0.00015 },
+    { x: -18, z: 18, y: 1.2, scale: 27, opacity: 0.5, speed: 0.0004, rotSpeed: -0.0001 },
+];
+
+const clouds = [];
+for (const d of cloudData) {
+    const geom = new THREE.PlaneGeometry(d.scale, d.scale);
+    const mat = new THREE.MeshStandardMaterial({
+        map: cloudTex,
+        transparent: true,
+        opacity: d.opacity,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.NormalBlending,
+        color: 0x223355,
+    });
+    const cloud = new THREE.Mesh(geom, mat);
+    cloud.position.set(d.x, d.y, d.z);
+    cloud.rotation.x = -Math.PI / 2;
+    cloud.userData = { speed: d.speed, rotSpeed: d.rotSpeed, baseY: d.y };
+    cloudGroup.add(cloud);
+    clouds.push(cloud);
+}
+
+const FOG_PLANE_COUNT = 20;
+const fogPlanes = [];
+for (let i = 0; i < FOG_PLANE_COUNT; i++) {
+    const scale = 15 + Math.random() * 20;
+    const geom = new THREE.PlaneGeometry(scale, scale);
+    const mat = new THREE.MeshBasicMaterial({
+        map: cloudTex,
+        transparent: true,
+        opacity: 0.15 + Math.random() * 0.2,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        color: 0x112244,
+    });
+    const plane = new THREE.Mesh(geom, mat);
+    const angle = (i / FOG_PLANE_COUNT) * Math.PI * 2;
+    const dist = 8 + Math.random() * 15;
+    plane.position.set(
+        Math.cos(angle) * dist,
+        FLOOR_Y + 0.5 + Math.random() * (COLUMN_HEIGHT - 1),
+        Math.sin(angle) * dist
+    );
+    plane.rotation.x = -Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+    plane.rotation.z = Math.random() * Math.PI;
+    plane.userData = {
+        baseY: plane.position.y,
+        floatSpeed: 0.2 + Math.random() * 0.5,
+        floatAmp: 0.2 + Math.random() * 0.5,
+        rotSpeed: (Math.random() - 0.5) * 0.0003,
+    };
+    scene.add(plane);
+    fogPlanes.push(plane);
+}
+
 const portalGroup = new THREE.Group();
 scene.add(portalGroup);
 
 function createSoftParticleTexture() {
     const c = document.createElement('canvas');
-    c.width = 256;
-    c.height = 256;
+    c.width = 512;
+    c.height = 512;
     const ctx = c.getContext('2d');
-    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    const g = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
     g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(0.08, 'rgba(200,255,255,0.9)');
-    g.addColorStop(0.2, 'rgba(0,220,255,0.6)');
-    g.addColorStop(0.45, 'rgba(0,100,255,0.2)');
-    g.addColorStop(0.7, 'rgba(40,0,120,0.05)');
+    g.addColorStop(0.05, 'rgba(220,255,255,0.95)');
+    g.addColorStop(0.12, 'rgba(100,240,255,0.7)');
+    g.addColorStop(0.25, 'rgba(0,200,255,0.4)');
+    g.addColorStop(0.5, 'rgba(0,100,200,0.12)');
+    g.addColorStop(0.75, 'rgba(20,20,80,0.03)');
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 256, 256);
-    return new THREE.CanvasTexture(c);
+    ctx.fillRect(0, 0, 512, 512);
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    return tex;
 }
 
 function createSparkTexture() {
     const c = document.createElement('canvas');
-    c.width = 64;
-    c.height = 64;
+    c.width = 128;
+    c.height = 128;
     const ctx = c.getContext('2d');
-    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
     g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(0.15, 'rgba(200,240,255,0.8)');
-    g.addColorStop(0.5, 'rgba(100,180,255,0.2)');
+    g.addColorStop(0.1, 'rgba(220,245,255,0.9)');
+    g.addColorStop(0.3, 'rgba(150,210,255,0.4)');
+    g.addColorStop(0.6, 'rgba(80,150,220,0.1)');
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 64, 64);
-    return new THREE.CanvasTexture(c);
+    ctx.fillRect(0, 0, 128, 128);
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    return tex;
 }
 
 const softTex = createSoftParticleTexture();
@@ -623,6 +727,16 @@ function animate() {
     }
     glowParticles.geometry.attributes.position.needsUpdate = true;
 
+    for (const cloud of clouds) {
+        cloud.rotation.z += cloud.userData.rotSpeed;
+        cloud.position.y = cloud.userData.baseY + Math.sin(elapsed * cloud.userData.speed * 5) * 0.3;
+    }
+
+    for (const fp of fogPlanes) {
+        fp.rotation.z += fp.userData.rotSpeed;
+        fp.position.y = fp.userData.baseY + Math.sin(elapsed * fp.userData.floatSpeed) * fp.userData.floatAmp;
+    }
+
     const dPositions = dust.geometry.attributes.position.array;
     for (let i = 0; i < DUST_COUNT; i++) {
         dPositions[i * 3] += dustSpeeds[i].x;
@@ -639,6 +753,10 @@ function animate() {
 }
 
 animate();
+
+setTimeout(() => {
+    document.getElementById('loading').classList.add('hidden');
+}, 1500);
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
