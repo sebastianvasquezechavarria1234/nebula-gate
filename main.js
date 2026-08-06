@@ -127,8 +127,10 @@ function animate() {
 
     const minY = 0.5;
     const maxY = 4.5;
-    if (camera.position.y < minY) camera.position.y = minY;
-    if (camera.position.y > maxY) camera.position.y = maxY;
+    if (camera.position.y < minY || camera.position.y > maxY) {
+        camera.position.y = Math.max(minY, Math.min(maxY, camera.position.y));
+        camera.lookAt(controls.target);
+    }
 
     renderer.render(scene, camera);
 }
