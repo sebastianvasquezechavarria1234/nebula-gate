@@ -1,13 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Google Sans Flex", sans-serif;
 }
 
 body {
     overflow: hidden;
     background: #010206;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+
     color: #e0f2fe;
     user-select: none;
 }
@@ -73,19 +76,27 @@ body {
     color: #38bdf8;
     margin-top: 24px;
     font-size: 13px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    font-weight: 600;
+  
+    font-weight: 100;
     opacity: 0.85;
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes pulse {
-    from { transform: scale(0.8); opacity: 0.5; }
-    to { transform: scale(1.2); opacity: 1; }
+    from {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    to {
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }
 
 /* Glassmorphic HUD Controls */
@@ -113,7 +124,7 @@ body {
     color: #38bdf8;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 2px;
+ 
     backdrop-filter: blur(8px);
     margin-bottom: 8px;
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
@@ -121,11 +132,7 @@ body {
 
 .hud-header h1 {
     font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    background: linear-gradient(135deg, #ffffff 0%, #7dd3fc 50%, #c084fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 200;
     text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
 }
 
@@ -135,7 +142,7 @@ body {
     gap: 24px;
     background: rgba(8, 15, 30, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 10px 24px;
+    padding: 4px 7px;
     border-radius: 30px;
     backdrop-filter: blur(12px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -147,11 +154,10 @@ body {
     gap: 8px;
     color: rgba(186, 230, 253, 0.6);
     font-size: 12px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    font-weight: 500;
+
+    font-weight: 100;
 }
 
 .hud-footer svg {
-    color: #38bdf8;
+    color: white;
 }
