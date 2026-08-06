@@ -6,8 +6,10 @@
 
 body {
     overflow: hidden;
-    background: #000;
-    font-family: 'Segoe UI', sans-serif;
+    background: #010206;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #e0f2fe;
+    user-select: none;
 }
 
 #scene {
@@ -21,16 +23,17 @@ body {
     cursor: grabbing;
 }
 
+/* Loading Preloader */
 #loading {
     position: fixed;
     inset: 0;
-    background: #050510;
+    background: radial-gradient(circle at center, #070d1a 0%, #010206 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     z-index: 100;
-    transition: opacity 0.8s ease;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #loading.hidden {
@@ -38,37 +41,117 @@ body {
     pointer-events: none;
 }
 
-#loading .spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(0, 255, 255, 0.1);
-    border-top-color: #00ffff;
+.spinner-container {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(0, 240, 255, 0.1);
+    border-top-color: #00f0ff;
+    border-right-color: #7700ff;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+.spinner-core {
+    width: 16px;
+    height: 16px;
+    background: #00f0ff;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #00f0ff, 0 0 40px #7700ff;
+    animation: pulse 1.5s ease-in-out infinite alternate;
 }
 
 #loading p {
-    color: #00ffff;
-    margin-top: 16px;
-    font-size: 14px;
-    letter-spacing: 3px;
+    color: #38bdf8;
+    margin-top: 24px;
+    font-size: 13px;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    opacity: 0.7;
+    font-weight: 600;
+    opacity: 0.85;
 }
 
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
-#info {
+@keyframes pulse {
+    from { transform: scale(0.8); opacity: 0.5; }
+    to { transform: scale(1.2); opacity: 1; }
+}
+
+/* Glassmorphic HUD Controls */
+#hud-container {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(100, 200, 255, 0.4);
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    inset: 0;
     pointer-events: none;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 32px 40px;
+}
+
+.hud-header {
+    align-self: flex-start;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-radius: 20px;
+    color: #38bdf8;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    backdrop-filter: blur(8px);
+    margin-bottom: 8px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.hud-header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #ffffff 0%, #7dd3fc 50%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+}
+
+.hud-footer {
+    align-self: center;
+    display: flex;
+    gap: 24px;
+    background: rgba(8, 15, 30, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 24px;
+    border-radius: 30px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.hud-footer span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(186, 230, 253, 0.6);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.hud-footer svg {
+    color: #38bdf8;
 }
