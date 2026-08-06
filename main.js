@@ -264,8 +264,8 @@ const reflectorFloor = new Reflector(
     new THREE.PlaneGeometry(ROOM_SIZE, ROOM_SIZE),
     {
         clipBias: 0.003,
-        textureWidth: window.innerWidth * renderer.getPixelRatio() * 0.75,
-        textureHeight: window.innerHeight * renderer.getPixelRatio() * 0.75,
+        textureWidth: Math.floor(window.innerWidth * renderer.getPixelRatio()),
+        textureHeight: Math.floor(window.innerHeight * renderer.getPixelRatio()),
         color: 0x151e2e,
     }
 );
@@ -283,6 +283,7 @@ const floorMat = new THREE.MeshStandardMaterial({
     roughness: 0.3,
     transparent: true,
     opacity: 0.5,
+    depthWrite: false,
     envMapIntensity: 2.2,
 });
 const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_SIZE, ROOM_SIZE), floorMat);
@@ -918,7 +919,7 @@ window.addEventListener('resize', () => {
 
     bloomPass.resolution.set(window.innerWidth, window.innerHeight);
     reflectorFloor.getRenderTarget().setSize(
-        window.innerWidth * renderer.getPixelRatio() * 0.75,
-        window.innerHeight * renderer.getPixelRatio() * 0.75
+        Math.floor(window.innerWidth * renderer.getPixelRatio()),
+        Math.floor(window.innerHeight * renderer.getPixelRatio())
     );
 });
