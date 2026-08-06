@@ -38,8 +38,8 @@ controls.dampingFactor = 0.04;
 controls.target.set(0, 3.4, 0);
 controls.minDistance = 4.0;
 controls.maxDistance = 35;
-controls.maxPolarAngle = Math.PI * 0.485;
-controls.minPolarAngle = Math.PI * 0.05;
+controls.maxPolarAngle = Math.PI * 0.46;
+controls.minPolarAngle = Math.PI * 0.08;
 controls.enablePan = false;
 controls.update();
 
@@ -47,7 +47,7 @@ const FLOOR_Y = 0;
 const CEILING_Y = 12;
 const PORTAL_Y = 4.2;
 const PORTAL_RADIUS = 3.6;
-const ROOM_SIZE = 70;
+const ROOM_SIZE = 160;
 
 // ==========================================
 // PROCEDURAL TEXTURE ENGINE
@@ -224,11 +224,11 @@ mainDirLight.castShadow = true;
 mainDirLight.shadow.mapSize.width = 2048;
 mainDirLight.shadow.mapSize.height = 2048;
 mainDirLight.shadow.camera.near = 1;
-mainDirLight.shadow.camera.far = 50;
-mainDirLight.shadow.camera.left = -20;
-mainDirLight.shadow.camera.right = 20;
-mainDirLight.shadow.camera.top = 20;
-mainDirLight.shadow.camera.bottom = -20;
+mainDirLight.shadow.camera.far = 100;
+mainDirLight.shadow.camera.left = -60;
+mainDirLight.shadow.camera.right = 60;
+mainDirLight.shadow.camera.top = 60;
+mainDirLight.shadow.camera.bottom = -60;
 mainDirLight.shadow.bias = -0.0005;
 mainDirLight.shadow.normalBias = 0.03;
 scene.add(mainDirLight);
@@ -628,9 +628,9 @@ function updateLightning(time) {
 // ==========================================
 // VOLUMETRIC LIGHT CONE (GOD RAYS)
 // ==========================================
-const volumetricGeom = new THREE.CylinderGeometry(PORTAL_RADIUS, PORTAL_RADIUS * 2.6, 16, 64, 1, true);
+const volumetricGeom = new THREE.CylinderGeometry(PORTAL_RADIUS * 0.95, PORTAL_RADIUS * 1.35, 9, 64, 1, true);
 volumetricGeom.rotateX(Math.PI / 2);
-volumetricGeom.translate(0, 0, 8);
+volumetricGeom.translate(0, 0, 4.5);
 
 const volumetricMat = new THREE.ShaderMaterial({
     uniforms: {
@@ -899,9 +899,6 @@ function animate() {
     dustMesh.geometry.attributes.position.needsUpdate = true;
 
     controls.update();
-    if (camera.position.y < FLOOR_Y + 0.3) camera.position.y = FLOOR_Y + 0.3;
-    if (camera.position.y > CEILING_Y - 0.5) camera.position.y = CEILING_Y - 0.5;
-
     composer.render();
 }
 
