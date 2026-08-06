@@ -6,26 +6,28 @@
     <title>Singularity Portal 3D - Experience</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="family=Outfit:wght@300;400;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="loading">
         <div class="spinner-container">
+            <div class="spinner-ring-outer"></div>
             <div class="spinner"></div>
             <div class="spinner-core"></div>
         </div>
         <p>Iniciando Motor de Singularidad...</p>
+        <div class="loading-progress-bar">
+            <div class="loading-progress-fill" id="progress-fill"></div>
+        </div>
     </div>
 
     <div id="hud-container">
         <div class="hud-header">
-           
-            <h1>Portal</h1>
         </div>
         <div class="hud-footer">
-            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg> Drag to Orbit</span>
-            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Scroll to Zoom</span>
+            <span>+ Drag to Orbit</span>
+            <span>+ Scroll to Zoom</span>
         </div>
     </div>
 

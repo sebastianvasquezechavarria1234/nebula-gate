@@ -888,12 +888,35 @@ function animate() {
     composer.render();
 }
 
-animate();
+// Preloader & Scene Unblur Transition Controller
+const progressFill = document.getElementById('progress-fill');
+const sceneCanvas = document.getElementById('scene');
+const hudContainer = document.getElementById('hud-container');
+const loadingEl = document.getElementById('loading');
 
-setTimeout(() => {
-    const loadingEl = document.getElementById('loading');
-    if (loadingEl) loadingEl.classList.add('hidden');
-}, 1000);
+let loadProgress = 0;
+const progressInterval = setInterval(() => {
+    loadProgress += Math.random() * 25 + 15;
+    if (loadProgress >= 100) {
+        loadProgress = 100;
+        clearInterval(progressInterval);
+
+        if (progressFill) progressFill.style.width = '100%';
+
+        setTimeout(() => {
+            // Preloader Blur Exit
+            if (loadingEl) loadingEl.classList.add('hidden');
+            // Scene Blur Entrance
+            if (sceneCanvas) sceneCanvas.classList.add('active-scene');
+            // HUD Fade In
+            if (hudContainer) hudContainer.classList.add('hud-visible');
+        }, 300);
+    } else {
+        if (progressFill) progressFill.style.width = `${loadProgress}%`;
+    }
+}, 120);
+
+animate();
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;

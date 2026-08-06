@@ -10,44 +10,60 @@
 body {
     overflow: hidden;
     background: #010206;
-
     color: #e0f2fe;
     user-select: none;
 }
 
+/* 3D Scene Canvas with Blur Entrance */
 #scene {
     display: block;
     width: 100vw;
     height: 100vh;
     cursor: grab;
+    filter: blur(25px);
+    transform: scale(1.03);
+    transition: filter 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#scene.active-scene {
+    filter: blur(0px);
+    transform: scale(1);
 }
 
 #scene:active {
     cursor: grabbing;
 }
 
-/* Loading Preloader */
+/* Futuristic Loading Preloader */
 #loading {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, #070d1a 0%, #010206 100%);
+    background: radial-gradient(circle at center, rgba(8, 15, 30, 0.95) 0%, rgba(1, 2, 6, 0.98) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     z-index: 100;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+    backdrop-filter: blur(15px);
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                filter 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #loading.hidden {
     opacity: 0;
+    filter: blur(30px);
+    transform: scale(1.08);
     pointer-events: none;
 }
 
 .spinner-container {
     position: relative;
-    width: 70px;
-    height: 70px;
+    width: 90px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,47 +72,73 @@ body {
 .spinner {
     position: absolute;
     inset: 0;
-    border: 2px solid rgba(0, 240, 255, 0.1);
+    border: 2px solid rgba(0, 240, 255, 0.08);
     border-top-color: #00f0ff;
     border-right-color: #7700ff;
     border-radius: 50%;
     animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
 }
 
+.spinner-ring-outer {
+    position: absolute;
+    inset: -12px;
+    border: 1px dashed rgba(56, 189, 248, 0.25);
+    border-radius: 50%;
+    animation: spin-reverse 8s linear infinite;
+}
+
 .spinner-core {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     background: #00f0ff;
     border-radius: 50%;
-    box-shadow: 0 0 20px #00f0ff, 0 0 40px #7700ff;
+    box-shadow: 0 0 25px #00f0ff, 0 0 50px #7700ff, 0 0 75px #00f0ff;
     animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.loading-progress-bar {
+    width: 180px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    margin-top: 28px;
+    overflow: hidden;
+    position: relative;
+}
+
+.loading-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    background: linear-gradient(90deg, #00f0ff, #7700ff, #00f0ff);
+    border-radius: 4px;
+    box-shadow: 0 0 10px #00f0ff;
+    transition: width 0.3s ease;
 }
 
 #loading p {
     color: #38bdf8;
-    margin-top: 24px;
+    margin-top: 16px;
     font-size: 13px;
-  
-    font-weight: 100;
-    opacity: 0.85;
+    font-weight: 200;
+    letter-spacing: 2px;
+    opacity: 0.9;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+    to { transform: rotate(-360deg); }
 }
 
 @keyframes pulse {
-    from {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-
-    to {
-        transform: scale(1.2);
-        opacity: 1;
-    }
+    from { transform: scale(0.75); opacity: 0.6; }
+    to { transform: scale(1.25); opacity: 1; }
 }
 
 /* Glassmorphic HUD Controls */
@@ -109,6 +151,12 @@ body {
     flex-direction: column;
     justify-content: space-between;
     padding: 32px 40px;
+    opacity: 0;
+    transition: opacity 1.5s ease 0.6s;
+}
+
+#hud-container.hud-visible {
+    opacity: 1;
 }
 
 .hud-header {
@@ -124,7 +172,6 @@ body {
     color: #38bdf8;
     font-size: 11px;
     font-weight: 700;
- 
     backdrop-filter: blur(8px);
     margin-bottom: 8px;
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
@@ -142,7 +189,7 @@ body {
     gap: 24px;
     background: rgba(8, 15, 30, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 4px 7px;
+    padding: 6px 16px;
     border-radius: 30px;
     backdrop-filter: blur(12px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -152,10 +199,9 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: rgba(186, 230, 253, 0.6);
+    color: rgba(186, 230, 253, 0.7);
     font-size: 12px;
-
-    font-weight: 100;
+    font-weight: 200;
 }
 
 .hud-footer svg {
