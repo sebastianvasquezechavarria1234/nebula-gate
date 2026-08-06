@@ -5,7 +5,6 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { Reflector } from 'three/addons/objects/Reflector.js';
 
 // ==========================================
 // RENDERER & SCENE SETUP
@@ -259,36 +258,22 @@ scene.add(portalFloorLight);
 // ROOM ARCHITECTURE
 // ==========================================
 
-// Planar Mirror Reflector Floor
-const reflectorFloor = new Reflector(
-    new THREE.PlaneGeometry(ROOM_SIZE, ROOM_SIZE),
-    {
-        clipBias: 0.003,
-        textureWidth: Math.floor(window.innerWidth * renderer.getPixelRatio()),
-        textureHeight: Math.floor(window.innerHeight * renderer.getPixelRatio()),
-        color: 0x151e2e,
-    }
-);
-reflectorFloor.rotation.x = -Math.PI / 2;
-reflectorFloor.position.y = FLOOR_Y;
-scene.add(reflectorFloor);
-
-// Floor Overlay with PBR Normal Map & Puddle Roughness
-const floorMat = new THREE.MeshStandardMaterial({
+// Single Unified Photorealistic PBR Floor (Zero Z-Fighting, Smooth 60FPS)
+const floorMat = new THREE.MeshPhysicalMaterial({
     map: floorTex,
     normalMap: floorNormalMap,
-    normalScale: new THREE.Vector2(0.7, 0.7),
+    normalScale: new THREE.Vector2(0.65, 0.65),
     roughnessMap: floorRoughnessMap,
-    metalness: 0.65,
-    roughness: 0.3,
-    transparent: true,
-    opacity: 0.5,
-    depthWrite: false,
-    envMapIntensity: 2.2,
+    metalness: 0.85,
+    roughness: 0.15,
+    clearcoat: 0.6,
+    clearcoatRoughness: 0.1,
+    envMapIntensity: 3.2,
+    reflectivity: 0.9,
 });
 const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_SIZE, ROOM_SIZE), floorMat);
 floorMesh.rotation.x = -Math.PI / 2;
-floorMesh.position.y = FLOOR_Y + 0.01;
+floorMesh.position.y = FLOOR_Y;
 floorMesh.receiveShadow = true;
 scene.add(floorMesh);
 
@@ -918,8 +903,4 @@ window.addEventListener('resize', () => {
     composer.setSize(window.innerWidth, window.innerHeight);
 
     bloomPass.resolution.set(window.innerWidth, window.innerHeight);
-    reflectorFloor.getRenderTarget().setSize(
-        Math.floor(window.innerWidth * renderer.getPixelRatio()),
-        Math.floor(window.innerHeight * renderer.getPixelRatio())
-    );
 });
