@@ -220,6 +220,8 @@ portal/
 
 ---
 
+<div align="center">
 
+Made with ❤️ by <a href="https://sebas-dev.vercel.app/" target="_blank" rel="noopener noreferrer">Sebastián V</a>
 
-*Built with curiosity, Three.js, and a fascination for things that shouldn't exist but look beautiful anyway.*
+</div>
